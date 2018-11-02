@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import { MongoError } from 'mongodb';
 import bodyParser from 'body-parser';
 
+import { userRouter } from './Routes/index';
+
 const app = express();
 const mongoURI: string = process.env.MONGOURI || 'mongodb://127.0.0.1:27017/authsys';
 const PORT = process.env.PORT || 4000;
@@ -17,6 +19,8 @@ mongoose.connect(mongoURI, {useNewUrlParser: true}, (err: MongoError) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser({extended: true}));
+
+app.use('/user', userRouter);
 
 app.listen(PORT, (err: Error) => {
   if (err) {

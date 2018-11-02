@@ -3,12 +3,13 @@ import bcrypt from 'bcryptjs';
 
 import { emailValidator } from './validation';
 
-export interface IUserSchema {
+export interface IUser {
   email: string;
   password: string;
   uids: string[];
-  _id?: string;
 }
+
+export interface IUserSchema extends mongoose.Document, IUser {}
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -44,6 +45,29 @@ UserSchema.pre('save', function(next: Function) {
     .catch(err => {throw err})  
   })
   .catch(err => {throw err})
+});
+
+UserSchema.pre('findOneAndUpdate', function(next: Function) {
+  if (this.getUpdate().$set.password) {
+    bcrypt.genSalt(10)
+    .then((salt: string) => {
+  
+      bcrypt.hash(this.getUpdate().$set.password, salt)
+      .then((hash: string) => {
+        this.update({$set: {
+          password: hash
+        }});
+  
+        next();
+  
+      })
+      .catch(err => {throw err})  
+    })
+    .catch(err => {throw err})
+    
+  } else {
+    next()
+  }
 });
 
 export default mongoose.model('users', UserSchema);

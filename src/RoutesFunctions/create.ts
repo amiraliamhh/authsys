@@ -5,15 +5,15 @@ import {
 } from 'express';
 
 import { codeJwt, IJWTObj } from '../Auth/index';
-import UserModel, { IUserSchema } from '../Model/index';
+import UserModel, { IUser } from '../Model/index';
 import { IRes } from '../utils/responses';
 import { sendErr } from './index';
 
 export function signUp(req: Request, res: Response, next: NextFunction) {
-  const user: IUserSchema = {
+  const user: IUser = {
     email: <string>req.body.email,
     password: <string>req.body.password,
-    uids: [<string>req.body.uid]
+    uids: [req.get('X-UID') as string]
   }
 
   UserModel.create(user)
@@ -21,7 +21,7 @@ export function signUp(req: Request, res: Response, next: NextFunction) {
     const newUser: IJWTObj = {
       email: <string>userObj.email,
       password: <string>userObj.password,
-      uid: <string>req.body.uid
+      uid: req.get('X-UID') as string
     };
 
     codeJwt(newUser)
