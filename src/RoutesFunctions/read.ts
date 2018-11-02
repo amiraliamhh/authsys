@@ -61,9 +61,11 @@ export function readUser(req: Request, res: Response, next: NextFunction) {
     .then((user) => {
       const iUser = <IUserSchema>user;
       if (iUser.uids.includes(req.get('X-UID') as string)) {
+        delete iUser.uids;
+
         const response: IRes = {
           success: true,
-          data: user
+          data: iUser
         };
 
         res.json(response);
